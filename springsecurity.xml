@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	<beans:bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+
+<beans:property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+<beans:property name="url" value="jdbc:mysql://localhost:3306/maker"/>
+<beans:property name="username" value="root"/>
+<beans:property name="password" value="admin"/>
+</beans:bean>
+	<http auto-config="true">
+	<intercept-url pattern="/loginform" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+	<intercept-url pattern="/loginfailure" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+	<intercept-url pattern="/resources/**" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+	<intercept-url pattern="/admin*" access="ROLE_ADMIN"/>
+	<intercept-url pattern="/user*" access="ROLE_USER"/>
+	<form-login login-page="/loginform" authentication-failure-url="/loginfailure" default-target-url="/defaultpage" always-use-default-target="true"/>
+	<access-denied-handler error-page="/noaccess"/>
+	</http>
+  <beans:bean id="pencoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>	
+	
+	
+	
+	<authentication-manager>
+	<authentication-provider>
+	<password-encoder ref="pencoder"/>
+	<!-- <user-service>
+	
+	<user name="user01" password="$2a$10$jRWgYdWD6k6FYTkNh2cjBO46hPjA5cUXDXSvZVSTYM6iDkLMt/rYi" authorities="ROLE_MAKER"/>
+	<user name="user02" password="user02" authorities="ROLE_CHECKER"/>
+	</user-service>  -->
+	
+	 <jdbc-user-service data-source-ref="ds" users-by-username-query="select userid,password,checkEnable from user1010 where userid=?" authorities-by-username-query="select userid,rolename from user1010 u join user10_role10 ur on u.userid=ur.user_id join role1010 r on ur.role_id=r.roleid where u.userid=?"/>
+	</authentication-provider>
+	</authentication-manager>
+	<!-- select userid,rolename from user1010 u join user10_role10 ur on u.userid=ur.user_id join role1010 r on ur.role_id=r.roleid; -->
+	</beans:beans>
